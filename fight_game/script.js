@@ -112,7 +112,7 @@ class Game {
   declareWinner(isOver,p1, p2) {
     
     // Create a message variable that will hold a message based on the condition
-    let message;
+    let message = "TIE";
 
     // If isOver is true AND p1 health is <= 0 then update message variable  to 'p1 WINS!'
     if(isOver && p1.health <= 0 ) {
@@ -121,7 +121,7 @@ class Game {
     // Else if isOver is true AND p2 health is <= 0 then update message variable  to 'p2 WINS!'
     else if(isOver == true && p2.health <= 0) {
         message = `${p1.name} WINS!`;
-  }
+    }
     // Play victory sound
     document.getElementById('victory').play();
     // Return message variable 
@@ -129,21 +129,29 @@ class Game {
   }
 
   // ** Reset the players health back to it's original state and isOver to FALSE **
-  reset(p1,p2) {
+  reset(a,b) {
     // set p1 health and p2 health back to 100 and isOver back to false and clear resultDiv.innerText and don't forget to updateGame()
-
+    a.health = 100;
+    b.health = 100;
+    this.isOver = false;
+    resultDiv.innerText = '';
+    updateGame(a, b, this.isOver);
   }
   
   // ** Simulates the whole match untill one player runs out of health **
   play(p1, p2) {
     // Reset to make sure player health is back to full before starting
-
+    this.reset(p1, p2);
     // Make sure the players take turns untill isOver is TRUE
     while (!this.isOver) {
       //Make sure both players get strike() and heal() once each loop
+      p1.strike(p1, p2, p1.attackDamage);
+      p2.heal(p2);
+      p2.strike(p2, p1, p2.attackDamage);
+      p1.heal(p1);
     }
     // Once isOver is TRUE run the declareWinner() method 
-    
+    return this.declareWinner(this.isOver, p1, p2);
   }
 
 }
@@ -164,11 +172,12 @@ let game = new Game();
 updateGame(p1, p2, game.isOver);
 
 // ** Save intial isOver from the game object inside this variable **
-let gameState;
+let gameState = game.isOver;
 
 
 // ** Add a click listener to the simulate button that runs the play() method on click and pass in the players **
 
+playButton.onclick = () => resultDiv.innerText = game.play(p1, p2);
 
 // Add functionality where players can press a button to attack OR heal
 
